@@ -7,24 +7,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+    // 修正ポイント：URLを v1beta から v1 に変更
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: `Optimize this eBay title: ${prompt}` }] }]
+        contents: [{ parts: [{ text: `You are an eBay SEO expert. Optimize this title for sales. Max 80 characters. Output ONLY the optimized title: ${prompt}` }] }]
       })
     });
 
     const data = await response.json();
 
-    // 答えが返ってきた場合
+    // 成功した場合
     if (data.candidates && data.candidates[0].content.parts[0].text) {
       const output = data.candidates[0].content.parts[0].text.trim();
       res.status(200).json({ output });
     } 
-    // エラーが返ってきた場合、その内容をそのまま画面に出す
+    // まだエラーが出る場合に備えて、中身を詳しく表示する
     else {
-      res.status(500).json({ output: "Google says: " + JSON.stringify(data) });
+      res.status(500).json({ output: "Google API Response: " + JSON.stringify(data) });
     }
   } catch (error) {
     res.status(500).json({ output: "System Error: " + error.message });
