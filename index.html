@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List Twist - eBay Title Booster</title>
+    <title>Title-Vital - eBay Booster</title>
     <style>
         :root { --primary: #0070f3; --bg: #fafafa; --text: #111; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
@@ -15,21 +15,21 @@
         button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
         button:hover { opacity: 0.8; }
         #result { margin-top: 1.5rem; padding: 1rem; background: #f0f0f0; border-radius: 8px; min-height: 40px; font-weight: 500; word-break: break-all; }
-        .disclaimer { font-size: 11px; color: #999; margin-top: 2rem; line-height: 1.4; }
+        .disclaimer { font-size: 11px; color: #999; margin-top: 2rem; line-height: 1.4; text-align: left; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h1>🌪️ List Twist</h1>
+        <h1>🌪️ Title-Vital</h1>
         <p>Lightning-fast eBay Title Optimizer</p>
         
-        <input type="text" id="userInput" placeholder="Paste your simple title here...">
+        <input type="text" id="userInput" placeholder="Ex: Nintendo Switch Zelda">
         <button onclick="boost()">Boost Title ⚡</button>
 
-        <div id="result">Result will appear here...</div>
+        <div id="result">The optimized title will appear here...</div>
 
         <div class="disclaimer">
-            <b>Disclaimer:</b> Suggestions only. Check eBay policies and verify title accuracy before listing. We are not responsible for any listing disputes.
+            <b>Disclaimer:</b> This is an AI-generated suggestion. Please verify the title matches your item and complies with eBay policies before listing. We are not responsible for any listing issues.
         </div>
     </div>
 
@@ -39,7 +39,7 @@
             const resBox = document.getElementById('result');
             if (!input) return alert("Please enter a title!");
 
-            resBox.innerText = "Twisting... 🌀";
+            resBox.innerText = "Analyzing... ⚡";
 
             try {
                 const res = await fetch('/api/generate', {
@@ -48,9 +48,9 @@
                     body: JSON.stringify({ prompt: input })
                 });
                 const data = await res.json();
-                resBox.innerText = data.output || "Error. Try again.";
+                resBox.innerText = data.output || "Error: Something went wrong.";
             } catch (e) {
-                resBox.innerText = "Connection Error.";
+                resBox.innerText = "Error: Check your connection.";
             }
         }
     </script>
