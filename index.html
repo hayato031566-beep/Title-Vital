@@ -1,58 +1,496 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Title-Vital - eBay Booster</title>
-    <style>
-        :root { --primary: #0070f3; --bg: #fafafa; --text: #111; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        h1 { font-size: 2rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
-        p { color: #666; margin-bottom: 2rem; }
-        input { width: 100%; padding: 12px 16px; margin-bottom: 1rem; border: 1px solid #eaeaea; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; transition: border 0.2s; }
-        input:focus { border-color: var(--primary); }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
-        button:hover { opacity: 0.8; }
-        #result { margin-top: 1.5rem; padding: 1rem; background: #f0f0f0; border-radius: 8px; min-height: 40px; font-weight: 500; word-break: break-all; }
-        .disclaimer { font-size: 11px; color: #999; margin-top: 2rem; line-height: 1.4; text-align: left; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Title-Vital | eBay Title Booster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #0a0a0a;
+      --panel:     #111111;
+      --border:    #1f1f1f;
+      --border2:   #2a2a2a;
+      --text:      #f0f0f0;
+      --sub:       #555;
+      --sub2:      #3a3a3a;
+      --accent:    #c8f72e;   /* acid-lime */
+      --accent-dk: #9abf1a;
+      --mono:      'Space Mono', monospace;
+      --display:   'Syne', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--mono);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      z-index: 9999;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 32px 0;
+    }
+    .topbar-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sub);
+      border: 1px solid var(--border2);
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+    .topbar-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent); }
+      50%       { opacity: 0.5; box-shadow: 0 0 4px var(--accent); }
+    }
+
+    /* ── Main card ── */
+    .card {
+      width: 90%;
+      max-width: 540px;
+      margin: 52px auto 0;
+      padding: 48px 40px 44px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      position: relative;
+    }
+
+    /* Corner accent marks */
+    .card::before, .card::after {
+      content: '';
+      position: absolute;
+      width: 16px; height: 16px;
+      border-color: var(--accent);
+      border-style: solid;
+    }
+    .card::before {
+      top: -1px; left: -1px;
+      border-width: 2px 0 0 2px;
+      border-radius: 4px 0 0 0;
+    }
+    .card::after {
+      bottom: -1px; right: -1px;
+      border-width: 0 2px 2px 0;
+      border-radius: 0 0 4px 0;
+    }
+
+    /* ── Header ── */
+    .header { margin-bottom: 40px; }
+
+    .wordmark {
+      font-family: var(--display);
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+    }
+    .wordmark span { color: var(--accent); }
+
+    .tagline {
+      margin-top: 12px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sub);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 0 32px;
+    }
+
+    /* ── Label ── */
+    .field-label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sub);
+      margin-bottom: 10px;
+    }
+
+    /* ── Input ── */
+    .input-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .input-wrap::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 0 0 8px 8px;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.25s ease;
+    }
+    .input-wrap:focus-within::after { transform: scaleX(1); }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 15px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input[type="text"]::placeholder { color: var(--sub2); }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      background: rgba(200,247,46,0.03);
+    }
+
+    /* ── Boost Button ── */
+    .btn-boost {
+      width: 100%;
+      padding: 17px 24px;
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: #0a0a0a;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-boost::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: translateX(-100%);
+      transition: transform 0s;
+    }
+    .btn-boost:not(:disabled):hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-boost:not(:disabled):hover::before {
+      transform: translateX(100%);
+      transition: transform 0.55s ease;
+    }
+    .btn-boost:not(:disabled):active {
+      transform: translateY(1px) scale(0.99);
+    }
+    .btn-boost:disabled {
+      background: #1e2a0a;
+      color: var(--accent);
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(200,247,46,0.25);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Result area ── */
+    #result-area {
+      margin-top: 28px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      animation: fadeUp 0.35s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .result-box {
+      background: rgba(200,247,46,0.04);
+      border: 1px solid rgba(200,247,46,0.18);
+      border-radius: 10px;
+      padding: 20px 22px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      position: relative;
+      user-select: none;
+    }
+    .result-box:hover {
+      background: rgba(200,247,46,0.07);
+      border-color: rgba(200,247,46,0.35);
+    }
+
+    #resultText {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .copy-hint {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--sub);
+      margin-top: 8px;
+      transition: color 0.2s;
+      text-align: right;
+    }
+    .copy-hint.success { color: var(--accent); }
+
+    /* ── Char counter ── */
+    .char-counter {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--sub);
+      text-align: right;
+    }
+    .char-counter.warn  { color: #f59e0b; }
+    .char-counter.great { color: var(--accent); }
+
+    /* ── Footer ── */
+    .footer {
+      width: 100%;
+      max-width: 540px;
+      padding: 28px 32px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-copy {
+      font-size: 11px;
+      color: var(--sub2);
+      letter-spacing: 0.08em;
+    }
+    .footer-built {
+      font-size: 11px;
+      color: var(--sub2);
+      letter-spacing: 0.08em;
+    }
+    .footer-built em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      .card { padding: 36px 24px 32px; margin-top: 36px; }
+      .wordmark { font-size: 34px; }
+      .footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-    <div class="card">
-        <h1>🌪️ Title-Vital</h1>
-        <p>Lightning-fast eBay Title Optimizer</p>
-        
-        <input type="text" id="userInput" placeholder="Ex: Nintendo Switch Zelda">
-        <button onclick="boost()">Boost Title ⚡</button>
 
-        <div id="result">The optimized title will appear here...</div>
+  <nav class="topbar">
+    <span class="topbar-badge">v2.0 · eBay Optimizer</span>
+    <span class="topbar-dot" title="Live"></span>
+  </nav>
 
-        <div class="disclaimer">
-            <b>Disclaimer:</b> This is an AI-generated suggestion. Please verify the title matches your item and complies with eBay policies before listing. We are not responsible for any listing issues.
-        </div>
+  <main class="card">
+    <!-- Header -->
+    <header class="header">
+      <div class="wordmark">TITLE<span>-VITAL</span></div>
+      <p class="tagline">Lightning-fast eBay title optimization &middot; Built in public</p>
+    </header>
+
+    <hr class="divider" />
+
+    <!-- Input -->
+    <label class="field-label" for="userInput">Your Keywords</label>
+    <div class="input-wrap">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="e.g. Vintage Leica M3 Camera Body"
+        autocomplete="off"
+        spellcheck="false"
+        oninput="onInput(this.value)"
+      />
     </div>
 
-    <script>
-        async function boost() {
-            const input = document.getElementById('userInput').value;
-            const resBox = document.getElementById('result');
-            if (!input) return alert("Please enter a title!");
+    <!-- Boost -->
+    <button class="btn-boost" id="boostBtn" onclick="boost()">
+      <span id="btnLabel">⚡ Boost Title</span>
+    </button>
 
-            resBox.innerText = "Analyzing... ⚡";
+    <!-- Result -->
+    <div id="result-area">
+      <label class="field-label">Optimized Title</label>
+      <div class="result-box" id="resultBox" onclick="copyResult()">
+        <p id="resultText"></p>
+      </div>
+      <div class="copy-hint" id="copyHint">Click to copy</div>
+      <div class="char-counter" id="charCount"></div>
+    </div>
+  </main>
 
-            try {
-                const res = await fetch('/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: input })
-                });
-                const data = await res.json();
-                resBox.innerText = data.output || "Error: Something went wrong.";
-            } catch (e) {
-                resBox.innerText = "Error: Check your connection.";
-            }
-        }
-    </script>
+  <footer class="footer">
+    <span class="footer-copy">&copy; 2026 Title-Vital</span>
+    <span class="footer-built">Built in Public by <em>A Young Founder</em></span>
+  </footer>
+
+  <script>
+    const EBAY_LIMIT = 80;
+
+    function onInput(val) {
+      /* live char feedback could go here if needed */
+    }
+
+    async function boost() {
+      const input  = document.getElementById('userInput');
+      const btn    = document.getElementById('boostBtn');
+      const btnLbl = document.getElementById('btnLabel');
+      const resArea = document.getElementById('result-area');
+      const resText = document.getElementById('resultText');
+      const hint   = document.getElementById('copyHint');
+      const counter = document.getElementById('charCount');
+
+      const val = input.value.trim();
+      if (!val) { input.focus(); shakeBorder(input); return; }
+
+      // Loading state
+      btn.disabled = true;
+      btnLbl.innerHTML = '';
+      const spinner = document.createElement('div');
+      spinner.className = 'spinner';
+      const lbl = document.createElement('span');
+      lbl.textContent = 'Boosting…';
+      btnLbl.appendChild(spinner);
+      btnLbl.appendChild(lbl);
+
+      resArea.style.display = 'none';
+
+      try {
+        const res  = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: val }),
+        });
+        const data = await res.json();
+        const output = data.output || 'Error: AI not responding.';
+
+        resText.textContent = output;
+
+        // Char counter
+        const len = output.length;
+        counter.textContent = `${len} / ${EBAY_LIMIT} characters`;
+        counter.className   = 'char-counter' + (len <= EBAY_LIMIT ? ' great' : ' warn');
+
+        hint.textContent = 'Click to copy';
+        hint.className   = 'copy-hint';
+        resArea.style.display = 'flex';
+
+      } catch (e) {
+        alert('Network error — please try again.');
+      } finally {
+        btn.disabled = false;
+        btnLbl.innerHTML = '⚡ Boost Title';
+      }
+    }
+
+    function copyResult() {
+      const text  = document.getElementById('resultText').textContent;
+      const hint  = document.getElementById('copyHint');
+      if (!text) return;
+
+      navigator.clipboard.writeText(text).then(() => {
+        hint.textContent = 'Copied ✓';
+        hint.className   = 'copy-hint success';
+        setTimeout(() => {
+          hint.textContent = 'Click to copy';
+          hint.className   = 'copy-hint';
+        }, 2200);
+      }).catch(() => {
+        // Fallback for older browsers
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        hint.textContent = 'Copied ✓';
+        hint.className   = 'copy-hint success';
+        setTimeout(() => {
+          hint.textContent = 'Click to copy';
+          hint.className   = 'copy-hint';
+        }, 2200);
+      });
+    }
+
+    function shakeBorder(el) {
+      el.style.borderColor = '#ef4444';
+      el.animate([
+        { transform: 'translateX(0)'  },
+        { transform: 'translateX(-6px)' },
+        { transform: 'translateX(6px)'  },
+        { transform: 'translateX(-4px)' },
+        { transform: 'translateX(0)'  },
+      ], { duration: 320, easing: 'ease-out' });
+      setTimeout(() => { el.style.borderColor = ''; }, 700);
+    }
+
+    // Enter key support
+    document.getElementById('userInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') boost();
+    });
+  </script>
 </body>
 </html>
